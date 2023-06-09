@@ -1,12 +1,20 @@
-import {Dispatch, SetStateAction} from 'react';
+import {Dispatch, SetStateAction, useEffect, useRef} from 'react';
 import {StyleSheet, View, TextInput} from 'react-native';
 
 interface INameInputProps {
   name: string;
   changeName: Dispatch<SetStateAction<string>>;
+  focus: boolean;
+  greeting: () => void;
 }
 
-const NameInput = ({name, changeName}: INameInputProps) => {
+const NameInput = ({name, changeName, focus, greeting}: INameInputProps) => {
+  const inputRef = useRef<TextInput | null>(null);
+
+  useEffect(() => {
+    if (focus) inputRef.current?.focus();
+  }, [focus]);
+
   return (
     <View style={styles.block}>
       <TextInput
@@ -14,6 +22,8 @@ const NameInput = ({name, changeName}: INameInputProps) => {
         value={name}
         onChangeText={changeName}
         placeholder='이름을 입력하세요.'
+        ref={inputRef}
+        onSubmitEditing={greeting}
       />
     </View>
   );

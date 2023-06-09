@@ -20,8 +20,37 @@ const DismissKeyboard = ({children}: PropsWithChildren) => (
     {children}
   </TouchableWithoutFeedback>
 );
+
+const GREETING = [
+  {hour: 22, greeting: 'Night'},
+  {hour: 18, greeting: 'Evening'},
+  {hour: 12, greeting: 'Afternoon'},
+  {hour: 5, greeting: 'Morning'},
+];
+
+const getGreeting = (hour: number, name: string) => {
+  const greeting = GREETING.find(greet => hour >= greet.hour)?.greeting;
+
+  return `Good ${greeting}, ${name}!`;
+};
+
 const App = () => {
   const [name, setName] = useState('');
+  const [greetingWithName, setGreetingWithName] = useState('');
+  const [focus, setFocus] = useState(false);
+
+  const greeting = () => {
+    const hour = new Date().getHours();
+
+    if (!name) {
+      setFocus(true);
+    } else {
+      setGreetingWithName(getGreeting(hour, name));
+      setName('');
+      setFocus(false);
+      Keyboard.dismiss();
+    }
+  };
 
   return (
     <SafeAreaProvider>
@@ -32,10 +61,15 @@ const App = () => {
             behavior={Platform.select({ios: 'padding'})}>
             <Header />
             <View style={styles.content}>
-              <Text style={styles.text}>TEST</Text>
-              <Button title='Hello' />
+              <Text style={styles.text}>{greetingWithName}</Text>
+              <Button title='Hello' onPress={greeting} />
             </View>
-            <NameInput name={name} changeName={setName} />
+            <NameInput
+              name={name}
+              changeName={setName}
+              focus={focus}
+              greeting={greeting}
+            />
           </KeyboardAvoidingView>
         </DismissKeyboard>
       </SafeAreaView>
@@ -54,6 +88,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 30,
+    height: 38,
   },
 });
 export default App;
