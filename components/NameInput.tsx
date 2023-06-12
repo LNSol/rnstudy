@@ -21,14 +21,23 @@ interface INameInputProps {
   focus: boolean;
   greeting: () => void;
 }
+interface IMyButtonProps {
+  onClick: () => void;
+}
 
-const MyButton = ({children}: PropsWithChildren) => {
+const MyButton = ({children, onClick}: PropsWithChildren<IMyButtonProps>) => {
   const {Ripple} = TouchableNativeFeedback;
 
   return Platform.select({
-    ios: <TouchableOpacity activeOpacity={0.5}>{children}</TouchableOpacity>,
+    ios: (
+      <TouchableOpacity activeOpacity={0.5} onPress={onClick}>
+        {children}
+      </TouchableOpacity>
+    ),
     android: (
-      <TouchableNativeFeedback background={Ripple('#bbc6fd', false)}>
+      <TouchableNativeFeedback
+        background={Ripple('#bbc6fd', false)}
+        onPress={onClick}>
         {children}
       </TouchableNativeFeedback>
     ),
@@ -53,7 +62,7 @@ const NameInput = ({name, changeName, focus, greeting}: INameInputProps) => {
         onSubmitEditing={greeting}
       />
       <View style={styles.circleWrapper}>
-        <MyButton>
+        <MyButton onClick={greeting}>
           <View style={styles.button}>
             <Icon name='add' color='#fff' size={24} />
           </View>
