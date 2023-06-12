@@ -1,5 +1,18 @@
-import {Dispatch, SetStateAction, useEffect, useRef} from 'react';
-import {StyleSheet, View, TextInput, TouchableOpacity} from 'react-native';
+import {
+  Dispatch,
+  PropsWithChildren,
+  SetStateAction,
+  useEffect,
+  useRef,
+} from 'react';
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableOpacity,
+  TouchableNativeFeedback,
+  Platform,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface INameInputProps {
@@ -8,6 +21,19 @@ interface INameInputProps {
   focus: boolean;
   greeting: () => void;
 }
+
+const MyButton = ({children}: PropsWithChildren) => {
+  const {Ripple} = TouchableNativeFeedback;
+
+  return Platform.select({
+    ios: <TouchableOpacity activeOpacity={0.5}>{children}</TouchableOpacity>,
+    android: (
+      <TouchableNativeFeedback background={Ripple('#bbc6fd', false)}>
+        {children}
+      </TouchableNativeFeedback>
+    ),
+  });
+};
 
 const NameInput = ({name, changeName, focus, greeting}: INameInputProps) => {
   const inputRef = useRef<TextInput | null>(null);
@@ -26,10 +52,12 @@ const NameInput = ({name, changeName, focus, greeting}: INameInputProps) => {
         ref={inputRef}
         onSubmitEditing={greeting}
       />
-      <View style={styles.button}>
-        <TouchableOpacity style={styles.add} activeOpacity={0.5}>
-          <Icon name='add' color='#fff' size={24} />
-        </TouchableOpacity>
+      <View style={styles.circleWrapper}>
+        <MyButton>
+          <View style={styles.button}>
+            <Icon name='add' color='#fff' size={24} />
+          </View>
+        </MyButton>
       </View>
     </View>
   );
@@ -49,14 +77,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
   },
-  button: {
+  circleWrapper: {
     width: 46,
     height: 46,
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 23,
+    overflow: 'hidden',
   },
-  add: {
+  button: {
     width: 46,
     height: 46,
     borderRadius: 23,
